@@ -36,11 +36,11 @@
 ;;;;;;;;;; functions related to Conjunction ;;;;;;;;;;;;
 
 ;; Extracts conjuncts from a conjunctive expression,
- (= (get-conjuncts $cnj) (
-    if (=  (, $ncnj $ptrn) $cnj)
-   ( let $result (get-conjuncts $ncnj) (cons-atom $ptrn $result)) 
-    ($cnj)
-))
+(= (get-conjuncts $cnj)
+   (case (let ($h $ncnj $ptrn) $cnj
+              (if (== $h ,) $cnj))
+     ((Empty ($cnj))
+      ((, $ncnj $ptrn) ( let $result (get-conjuncts $ncnj) (cons-atom $ptrn $result))))))
 
 
 (= (get_variables_for_tree $pattern)
