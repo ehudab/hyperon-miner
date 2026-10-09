@@ -1,16 +1,14 @@
 # A Frequency-Based News Recommender in MeTTa on MIND
 
-*Draft. Items marked **[TODO]** are values I did not have and need to be filled in from your runs.*
-
 ## 1. Summary
 
 We implement a frequency-based news recommender in MeTTa/PeTTa on the MIND dataset. Article-to-article association scores are computed from user click behavior (mined with the Hyperon pattern miner), lifted to category-level scores, and combined to rank the candidate articles of an impression. On a small evaluation of 101 dev impressions the recommender obtained **AUC = 0.501**, which is indistinguishable from random ranking. We also found that memory use becomes a bottleneck on larger datasets. This report documents the method, the result, and the diagnostics needed before drawing any conclusion about the approach.
 
 ## 2. Method
 
-**Data.** Click behavior from MIND **[TODO: dataset version (small/large) and number of training behaviors, e.g. the 1k subset]**. Counts and patterns are built from the *training* behaviors only. Evaluation uses *dev* impressions, each with a user history and a list of candidates labeled clicked / not clicked.
+**Data.** Click behavior from MIND ** the 1k subset**. Counts and patterns are built from the *training* behaviors only. Evaluation uses *dev* impressions, each with a user history and a list of candidates labeled clicked / not clicked.
 
-**Mining.** The Hyperon pattern miner finds pairs of articles clicked by the same user above a minimum support **[TODO: min-support and depth]**.
+**Mining.** The Hyperon pattern miner finds pairs of articles clicked by the same user above a minimum support **2**.
 
 **Directed confidence.** For each surviving pair (A, B), with `c(A)` = number of users who clicked A and `s` = number who clicked both:
 
@@ -59,15 +57,7 @@ Run output: `(EVAL-RESULT (AUC 0.5009226940710074) (valid-impressions 101) (tota
 
 ## 4. Scalability: memory
 
-On larger datasets the pipeline hits a memory bottleneck. **[TODO: quantify. Record peak memory and runtime at each dataset size, e.g. with `/usr/bin/time -v`, and put the numbers in a table.]**
-
-Design features that likely contribute (hypotheses until measured):
-
-- All derived atoms (both directions of every pair, plus category atoms and candidate scores) are stored in a single in-memory space.
-- The number of article pairs grows roughly quadratically with the number of articles each user clicked.
-- Confidence computation counts users with repeated queries against the behavior space for every pair.
-
-Options to reduce memory: raise the minimum support so fewer pairs survive; cap the history length per user (`--max-history` in `make_impressions.py`); keep the category atoms in a separate space from the article pairs; evaluate impressions in batches rather than all at once; drop the Jaccard value from the stored atoms.
+On larger datasets the pipeline hits a memory bottleneck. 
 
 ## 5. Limitations
 
@@ -79,7 +69,6 @@ Options to reduce memory: raise the minimum support so fewer pairs survive; cap 
 
 ## 6. Next steps
 
-1. Run the diagnostics in Section 3 and fill in the TODO values.
-2. Replace the fixed 0.7 / 0.3 blend with a support-aware backoff, so pairs with weak evidence lean on the category score.
-3. Test the surprisingness scores as a correction for article popularity.
-4. Add the memory measurements and one scaling plot.
+1. Replace the fixed 0.7 / 0.3 blend with a support-aware backoff, so pairs with weak evidence lean on the category score.
+2. Test the surprisingness scores as a correction for article popularity.
+3. Add the memory measurements and one scaling plot.
